@@ -12,29 +12,22 @@ public class TimeServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("ChannelRead triggered");
-        ByteBuf buf = (ByteBuf) msg;
-        System.out.println(buf.toString(Charset.defaultCharset()));
+//        ByteBuf buf = (ByteBuf) msg;
+//        System.out.println(buf.toString(Charset.defaultCharset()));
 
+        UnixTime time = (UnixTime) msg;
+        System.out.println(time);
 
-        final ByteBuf time = ctx.alloc().buffer(4); // (2)
-        time.writeInt((int) (System.currentTimeMillis() / 1000L + 2208988800L));
-        ctx.writeAndFlush(time); // (3)
+        ctx.close();
+        System.out.println("Closed connection");
     }
 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) { // (1)
-        System.out.println("ChannelActive Triggered");
-        final ByteBuf time = ctx.alloc().buffer(4); // (2)
-        time.writeInt((int) (System.currentTimeMillis() / 1000L + 2208988800L));
-        ctx.writeAndFlush(time); // (3)
-//        final ChannelFuture f = ctx.writeAndFlush(time); // (3)
-//        f.addListener(new ChannelFutureListener() {
-//            @Override
-//            public void operationComplete(ChannelFuture future) {
-//                assert f == future;
-//                ctx.close();
-//            }
-//        }); // (4)
+        System.out.println("ChannelActive triggered");
+        ctx.writeAndFlush(new UnixTime());
+//        ChannelFuture f = ctx.writeAndFlush(new UnixTime());
+//        f.addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
